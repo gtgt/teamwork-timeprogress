@@ -1,0 +1,10 @@
+assetic:
+    bundles: []
+    use_controller:
+        enabled: true
+        profiler: true
+    filters:
+        cssrewrite: ~
+        scss:
+            sass: /usr/local/bin/sass
+            apply_to: '\.(scss|sass)$'
