@@ -11,7 +11,7 @@
                         <span class="progress-text">{{ bar.percent1 }}%</span>
                     </div>
                     <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{ bar.percent2 ?? (100 - bar.percent1) }}%;">
-                        <span class="progress-text">{{ (bar.percent2 ?? 100 - bar.percent1) }}%</span>
+                        <span class="progress-text">{{ bar.percent2 ?? (100 - bar.percent1) }}%</span>
                     </div>
                 </div>
                 <div class="pull-left text-right" style="width: {{ bar.percent1 }}%;">
