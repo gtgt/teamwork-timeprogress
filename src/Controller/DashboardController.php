@@ -91,11 +91,11 @@ class DashboardController extends AbstractController {
         $workingHoursLeft = self::getWorkingDays('now') * 8;
 
         $percent1 = round($hours / $workingHoursAll * 100);
-        $percent2 = 100 - round($workingHoursLeft / $workingHoursAll * 100) - $percent1;
+        $percent2 = 100 - round(($workingHoursLeft / $workingHoursAll) * 100) - $percent1;
 
         $price1 = $hours / self::UNIT * self::UNIT_PRICE;
         $priceMax = $workingHoursAll / self::UNIT * self::UNIT_PRICE;
-        $price2 = $priceMax - $price1;
+        $price2 = ($workingHoursAll - $workingHoursLeft) / self::UNIT * self::UNIT_PRICE;
         $bars[] =  [
             'title' => strftime('%Y %B'),
             'percent1' => $percent1,

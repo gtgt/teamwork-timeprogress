@@ -14,17 +14,19 @@
                         <span class="progress-text">{{ bar.percent2 ?? (100 - bar.percent1) }}%</span>
                     </div>
                 </div>
-                <div class="pull-left text-right" style="width: {{ bar.percent1 }}%;">
+                <div class="pull-left text-right" style="width: {{ bar.percent1 }}%; font-size: 96%;">
                     <div>{{ bar.hours1|number_format(2, '.', ' ') }} h</div>
                     <div>{{ bar.price1|number_format(0, '.', ' ') }} ft</div>
                 </div>
-                {% if bar.percent2 is defined %}
-                    <div class="pull-left text-right" style="width: {{ bar.percent2 }}%;">
+                {% if bar.percent2 is defined and bar.hours2 > bar.hours1 %}
+                    <div class="pull-left text-right" style="width: {{ bar.percent2 }}%; font-size: 96%;">
                         <div>{{ bar.hours2|number_format(2, '.', ' ') }} h</div>
                         <div>{{ bar.price2|number_format(0, '.', ' ') }} ft</div>
+                        <div>-{{ (bar.hours2 - bar.hours1)|number_format(0, '.', ' ') }} h</div>
+                        <div>-{{ (bar.price2 - bar.price1)|number_format(0, '.', ' ') }} ft</div>
                     </div>
                 {% endif %}
-                <div class="pull-left text-right" style="width: {{ 100 - bar.percent1 - bar.percent2 ?? 0 }}%;">
+                <div class="pull-left text-right" style="width: {{ 100 - bar.percent1 - bar.percent2 ?? 0 }}%; font-size: 96%;">
                     <div>{{ bar.hours_max|number_format(2, '.', ' ') }} h</div>
                     <div>{{ bar.price_max|number_format(0, '.', ' ') }} ft</div>
                 </div>
