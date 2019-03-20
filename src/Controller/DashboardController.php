@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Month;
+use App\Manager\MonthManager;
 use App\Services\Teamwork;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,58 +20,98 @@ class DashboardController extends AbstractController {
     protected $teamwork;
 
     /**
+     * @var MonthManager
+     */
+    protected $manager;
+
+    /**
      * DashboardController constructor.
      *
      * @param Teamwork $teamwork
+     * @param MonthManager $manager
      */
-    public function __construct(Teamwork $teamwork) {
+    public function __construct(Teamwork $teamwork, MonthManager $manager) {
         $this->teamwork = $teamwork;
+        $this->manager = $manager;
     }
 
 
     /**
-     * @param string $from
+     * @param \DateTimeInterface $fromDate
+     * @param \DateTimeInterface $toDate
      * @param array $ignore
      *
      * @return int
+     *
+     * @throws \Exception
      */
-    protected static function getWorkingDays(string $from = 'first day of this month', array $ignore = []): int {
+    protected static function getWorkingDays(\DateTimeInterface $fromDate, \DateTimeInterface $toDate, array $ignore = []): int {
         $count = 0;
-        $counter = strtotime($from);
-        $month = (int)date('n', $counter);
-        while ((int)date('n', $counter) === $month) {
-            if ((int)date('N', $counter) < 6 && \in_array(date('w', $counter), $ignore, false) === false) {
+        $counter = $fromDate instanceof \DateTimeImmutable ? new \DateTime('@'.$fromDate->getTimestamp()) : clone $fromDate;
+        while ($counter <= $toDate) {
+            if ((int)$counter->format('N') < 6 && \in_array($counter->format('w'), $ignore, false) === false) {
                 $count++;
             }
-            $counter = strtotime('+1 day', $counter);
+            $counter->add(new \DateInterval('P1D'));
         }
         return $count;
     }
 
     /**
-     * @param $monthStr
+     * @param Month $month
      *
      * @return array
+     *
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \TeamWorkPm\Exception
+     * @throws \Exception
      */
-    private function addPrevMonth($monthStr) {
+    private function addMonth(Month $month) {
+        $fromDate = $month->getStartDate();
+        $toDate = $month->getEndDate();
         $hours = 0;
-        foreach ($this->teamwork->getTime('first day of '.$monthStr, 'last day of '.$monthStr) as $logEntry) {
+        $isThisMonth = $fromDate->diff(new \DateTimeImmutable(), true)->m < 1;
+        foreach ($this->teamwork->getTime($fromDate, $toDate) as $logEntry) {
             $hours += ((int)$logEntry->hours) + ((int)$logEntry->minutes) / 60;
         }
-        $workingHours = self::getWorkingDays('first day of '.$monthStr) * 8;
-        $percent = round($hours / $workingHours * 100);
-        $price = $hours / self::UNIT * self::UNIT_PRICE;
-        $priceMax = $workingHours / self::UNIT * self::UNIT_PRICE;
-        return [
-            'title' => strftime('%Y %B', strtotime($monthStr)),
-            'percent1' => $percent,
-            'price1' => $price,
-            'price_max' => $priceMax,
-            'hours1' => $hours,
-            'hours_max' => $workingHours,
+        $hours = round($hours, 2);
+        $common = [
+            'title' => (string)$month,
+            'subtitle' => $fromDate->format('m.d').' - '.$toDate->format('m.d'),
         ];
+        if ($isThisMonth) {
+            $workingHoursAll = self::getWorkingDays($fromDate, $toDate) * 8;
+            $workingHoursLeft = self::getWorkingDays(new \DateTimeImmutable('now'), $toDate) * 8;
+
+            $percent1 = round($hours / $workingHoursAll * 100);
+            $percent2 = 100 - round(($workingHoursLeft / $workingHoursAll) * 100) - $percent1;
+
+            $price1 = $hours / self::UNIT * self::UNIT_PRICE;
+            $priceMax = $workingHoursAll / self::UNIT * self::UNIT_PRICE;
+            $price2 = ($workingHoursAll - $workingHoursLeft) / self::UNIT * self::UNIT_PRICE;
+            return $common + [
+                'percent1' => $percent1,
+                'percent2' => $percent2,
+                'price1' => $price1,
+                'price2' => $price2,
+                'price_max' => $priceMax,
+                'hours1' => $hours,
+                'hours2' => $workingHoursAll - $workingHoursLeft,
+                'hours_max' => $workingHoursAll,
+            ];
+        } else {
+            $workingHours = self::getWorkingDays($fromDate, $toDate) * 8;
+            $percent = round($hours / $workingHours * 100);
+            $price = $hours / self::UNIT * self::UNIT_PRICE;
+            $priceMax = $workingHours / self::UNIT * self::UNIT_PRICE;
+            return $common + [
+                'percent1' => $percent,
+                'price1' => $price,
+                'price_max' => $priceMax,
+                'hours1' => $hours,
+                'hours_max' => $workingHours,
+            ];
+        }
     }
 
 
@@ -83,37 +125,15 @@ class DashboardController extends AbstractController {
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function index() {
-        $hours = 0;
-        foreach ($this->teamwork->getTime() as $logEntry) {
-            $hours += (int)$logEntry->hours + (int)$logEntry->minutes / 60;
+        $bars = [];
+        /** @var Month $month */
+        foreach ($this->manager->findBy([], ['id' => 'ASC'], 5) as $month) {
+            $bars[] = $this->addMonth($month);
         }
-        $workingHoursAll = self::getWorkingDays() * 8;
-        $workingHoursLeft = self::getWorkingDays('now') * 8;
-
-        $percent1 = round($hours / $workingHoursAll * 100);
-        $percent2 = 100 - round(($workingHoursLeft / $workingHoursAll) * 100) - $percent1;
-
-        $price1 = $hours / self::UNIT * self::UNIT_PRICE;
-        $priceMax = $workingHoursAll / self::UNIT * self::UNIT_PRICE;
-        $price2 = ($workingHoursAll - $workingHoursLeft) / self::UNIT * self::UNIT_PRICE;
-        $bars[] =  [
-            'title' => strftime('%Y %B'),
-            'percent1' => $percent1,
-            'percent2' => $percent2,
-            'price1' => $price1,
-            'price2' => $price2,
-            'price_max' => $priceMax,
-            'hours1' => $hours,
-            'hours2' => $workingHoursAll - $workingHoursLeft,
-            'hours_max' => $workingHoursAll,
-        ];
-
-        $bars[] = $this->addPrevMonth('-1 month');
-        $bars[] = $this->addPrevMonth('-2 month');
 
 
         return [
-            'bars' => array_reverse($bars),
+            'bars' => $bars,
         ];
     }
 }

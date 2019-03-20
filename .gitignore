@@ -17,4 +17,7 @@
 ###< symfony/web-server-bundle ###
 .idea
 ###< app ###
-public/css/
+/*.lock
+/public/css/*
+/public/js/*
+!/public/js/jquery-*.js

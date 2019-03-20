@@ -79,8 +79,8 @@ class Teamwork {
     }
 
     /**
-     * @param string $from
-     * @param string $to
+     * @param \DateTimeInterface $fromDate
+     * @param \DateTimeInterface $toDate
      *
      * @return \TeamWorkPm\Response\Model
      *
@@ -88,9 +88,7 @@ class Teamwork {
      * @throws \TeamWorkPm\Exception
      * @throws \Exception
      */
-    public function getTime($from = 'first day of this month', $to = 'last day of this month'): \TeamWorkPm\Response\Model {
-        $fromDate = new \DateTimeImmutable($from);
-        $toDate = new \DateTimeImmutable($to);
+    public function getTime(\DateTimeInterface $fromDate, \DateTimeInterface $toDate): \TeamWorkPm\Response\Model {
         $isThisMonth = $fromDate->diff(new \DateTimeImmutable(), true)->m < 1;
         $cacheKey = 'time|'.$fromDate->format('Ymd').'|'.$toDate->format('Ymd');
         $cacheItem = $this->cache->getItem($cacheKey);

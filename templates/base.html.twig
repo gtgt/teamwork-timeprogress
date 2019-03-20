@@ -3,6 +3,7 @@
 {% block head_style %}
     {# Override this block to add your own files! #}
     {% stylesheets
+        '@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/build/build.less'
         '@MopaBootstrapBundle/Resources/public/sass/mopabootstrapbundle-3.2.scss'
         'scss/app.scss' %}
         <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen"/>
@@ -13,18 +14,34 @@
      #}
 {% endblock head_style %}
 
-{% block foot_script_assetic %}
-    {# Please add the javascripts you need in your project
+{% block head_script %}
+    {{ parent() }}
     {% javascripts
-    '@MopaBootstrapBundle/Resources/public/bootstrap-sass/assets/javascripts/bootstrap/tooltip.js'
-    '@MopaBootstrapBundle/Resources/public/bootstrap-sass/assets/javascripts/bootstrap/*.js'
+    'js/jquery-3.3.1.slim.min.js'
+    '@MopaBootstrapBundle/Resources/public/bootstrap-sass/assets/javascripts/bootstrap.js'
+    '@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/bootstrap-datetimepicker.js'
+    '@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.hu.js'
     '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'
     '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
     %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
-    #}
-{% endblock foot_script_assetic %}
+    <script type="text/javascript">
+        $(function(){
+            $('[data-provider="datepicker"]').datetimepicker({autoclose: true, format: 'yyyy.mm.dd', minView: 'month', pickerPosition: 'bottom-left', todayBtn: true, startView: 'month'});
+            $('[data-provider="datetimepicker"]').datetimepicker({autoclose: true, format: 'yyyy.mm.dd hh:ii', pickerPosition: 'bottom-left', todayBtn: true});
+            $('[data-provider="timepicker"]').datetimepicker({autoclose: true, format: 'hh:ii', formatViewType: 'time', maxView: 'day', minView: 'hour', pickerPosition: 'bottom-left', startView: 'day'});
+
+            // Restore value from hidden input
+            $('input[type=hidden]', '.date').each(function(){
+                if($(this).val()) {
+                    $(this).parent().datetimepicker('setValue');
+                }
+            });
+
+        });
+    </script>
+{% endblock head_script %}
 
 {% block title %}{% block project_name %}Teamwork::TimeProgress{% endblock %} - {{ block('page_title') }}{% endblock %}
 
@@ -45,12 +62,11 @@
             {% if navbar is defined or search ?? false %}
                 <div id="navbar" class="navbar-collapse collapse">
                     {% if navbar is defined %}
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#">Dashboard</a></li>
-                        <li><a href="#">Settings</a></li>
-                        <li><a href="#">Profile</a></li>
-                        <li><a href="#">Help</a></li>
-                    </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            {% for item in navbar %}
+                                <li><a href="{{ item.path is defined ? path(item.path, item.param ?? {}) : item.url ?? '' }}">{{ item.title }}</a></li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
                     {% if search ?? false %}
                     <form class="navbar-form navbar-right">
@@ -86,7 +102,7 @@
                 </div>
             {% endif %}
             <div class="{% if sidebar is defined %}col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 {% else %} col-xs-12 {% endif %} main">
-                <h1 class="page-header">{% block page_title %}{{ block('title') }}{% endblock %}</h1>
+                <h1 class="page-header">{% block page_title %}{% endblock %}</h1>
                 {% block content %}{% endblock %}
             </div>
         </div>

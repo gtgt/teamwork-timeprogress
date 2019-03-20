@@ -1,4 +1,5 @@
 assetic:
+    debug: false
     bundles: []
     use_controller:
         enabled: true
@@ -6,5 +7,9 @@ assetic:
     filters:
         cssrewrite: ~
         scss:
-            sass: /usr/local/bin/sass
+            formatter: 'Leafo\ScssPhp\Formatter\Compressed'
             apply_to: '\.(scss|sass)$'
+        lessphp:
+            apply_to: '\.less$'
+        jsqueeze:
+            apply_to: '\.js$'

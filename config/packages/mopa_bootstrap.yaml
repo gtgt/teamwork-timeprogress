@@ -1,0 +1,3 @@
+mopa_bootstrap:
+    form:
+        show_legend: false # default is true
