@@ -22,13 +22,17 @@
                     <div class="pull-left text-right" style="width: {{ bar.percent2 }}%; font-size: 96%;">
                         <div>{{ bar.hours2|number_format(2, '.', ' ') }} h</div>
                         <div>{{ bar.price2|number_format(0, '.', ' ') }} ft</div>
-                        <div>-{{ (bar.hours2 - bar.hours1)|number_format(0, '.', ' ') }} h</div>
-                        <div>-{{ (bar.price2 - bar.price1)|number_format(0, '.', ' ') }} ft</div>
+                        <div class="text-muted">-{{ (bar.hours2 - bar.hours1)|number_format(0, '.', ' ') }} h</div>
+                        <div class="text-muted">-{{ (bar.price2 - bar.price1)|number_format(0, '.', ' ') }} ft</div>
                     </div>
                 {% endif %}
                 <div class="pull-left text-right" style="width: {{ 100 - bar.percent1 - bar.percent2 ?? 0 }}%; font-size: 96%;">
                     <div>{{ bar.hours_max|number_format(2, '.', ' ') }} h</div>
                     <div>{{ bar.price_max|number_format(0, '.', ' ') }} ft</div>
+                    {% if bar.percent2 is defined and bar.hours2 > bar.hours1 %}
+                        <div class="text-muted">{{ (bar.hours_max - bar.hours2 + bar.hours1)|number_format(0, '.', ' ') }} h</div>
+                        <div class="text-muted">{{ (bar.price_max - bar.price2 + bar.price1)|number_format(0, '.', ' ') }} ft</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
