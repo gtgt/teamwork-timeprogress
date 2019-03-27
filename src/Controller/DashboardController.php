@@ -37,22 +37,23 @@ class DashboardController extends AbstractController {
 
 
     /**
-     * @param \DateTimeInterface $fromDate
-     * @param \DateTimeInterface $toDate
-     * @param array $ignore
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param array $ignoreDays
      *
      * @return int
      *
      * @throws \Exception
      */
-    protected static function getWorkingDays(\DateTimeInterface $fromDate, \DateTimeInterface $toDate, array $ignore = []): int {
+    protected static function getWorkingHours(\DateTimeInterface $from, \DateTimeInterface $to, array $ignoreDays = []): int {
         $count = 0;
-        $counter = $fromDate instanceof \DateTimeImmutable ? new \DateTime('@'.$fromDate->getTimestamp()) : clone $fromDate;
-        while ($counter <= $toDate) {
-            if ((int)$counter->format('N') < 6 && \in_array($counter->format('w'), $ignore, false) === false) {
+        $counter = $from instanceof \DateTimeImmutable ? new \DateTime('@'.$from->getTimestamp()) : clone $from;
+        $counter->setTimezone($from->getTimezone());
+        while ($counter < $to) {
+            if ((int)$counter->format('N') < 6 && (int)$counter->format('G') >= 10 && (int)$counter->format('G') < 18 && \in_array($counter->format('w'), $ignoreDays, false) === false) {
                 $count++;
             }
-            $counter->add(new \DateInterval('P1D'));
+            $counter->add(new \DateInterval('PT1H'));
         }
         return $count;
     }
@@ -80,8 +81,8 @@ class DashboardController extends AbstractController {
             'subtitle' => $fromDate->format('m.d').' - '.$toDate->format('m.d'),
         ];
         if ($isThisMonth) {
-            $workingHoursAll = self::getWorkingDays($fromDate, $toDate) * 8;
-            $workingHoursLeft = self::getWorkingDays(new \DateTimeImmutable('now'), $toDate) * 8;
+            $workingHoursAll = self::getWorkingHours($fromDate, $toDate);
+            $workingHoursLeft = self::getWorkingHours(new \DateTimeImmutable('now'), $toDate);
 
             $percent1 = round($hours / $workingHoursAll * 100);
             $percent2 = 100 - round(($workingHoursLeft / $workingHoursAll) * 100) - $percent1;
@@ -100,7 +101,7 @@ class DashboardController extends AbstractController {
                 'hours_max' => $workingHoursAll,
             ];
         } else {
-            $workingHours = self::getWorkingDays($fromDate, $toDate) * 8;
+            $workingHours = self::getWorkingHours($fromDate, $toDate);
             $percent = round($hours / $workingHours * 100);
             $price = $hours / self::UNIT * self::UNIT_PRICE;
             $priceMax = $workingHours / self::UNIT * self::UNIT_PRICE;

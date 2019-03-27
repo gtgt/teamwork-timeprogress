@@ -57,7 +57,7 @@ class Month implements ManagerAwareEntityInterface {
     }
 
     /**
-     * @ORM\PreUpdate()
+     * @ORM\PostLoad()
      */
     public function setTime(): void {
         $this->startDate->setTime(0, 0, 0);
