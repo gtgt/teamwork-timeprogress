@@ -71,7 +71,7 @@ class DashboardController extends AbstractController {
         $fromDate = $month->getStartDate();
         $toDate = $month->getEndDate();
         $hours = 0;
-        $isThisMonth = $fromDate->diff(new \DateTimeImmutable(), true)->m < 1;
+        $isThisMonth = new \DateTimeImmutable() < $toDate;
         foreach ($this->teamwork->getTime($fromDate, $toDate) as $logEntry) {
             $hours += ((int)$logEntry->hours) + ((int)$logEntry->minutes) / 60;
         }
@@ -100,7 +100,7 @@ class DashboardController extends AbstractController {
                 'hours2' => $workingHoursAll - $workingHoursLeft,
                 'hours_max' => $workingHoursAll,
             ];
-        } else {
+        } /** @noinspection RedundantElseClauseInspection */ else {
             $workingHours = self::getWorkingHours($fromDate, $toDate);
             $percent = round($hours / $workingHours * 100);
             $price = $hours / self::UNIT * self::UNIT_PRICE;
