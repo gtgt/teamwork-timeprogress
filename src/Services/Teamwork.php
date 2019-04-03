@@ -2,6 +2,15 @@
 namespace App\Services;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
+use TeamWorkPm\Account;
+use TeamWorkPm\Auth;
+use TeamWorkPm\Exception;
+use TeamWorkPm\Factory;
+use TeamWorkPm\Me;
+use TeamWorkPm\Project;
+use TeamWorkPm\Response\Model;
+use TeamWorkPm\Time;
 
 class Teamwork {
 
@@ -17,22 +26,22 @@ class Teamwork {
      */
     public function __construct(CacheItemPoolInterface $cache) {
         $this->cache = $cache;
-        \TeamWorkPm\Auth::set('twp_od3QG88QkAUJVQA3dMw6U6JO3oqG');
+        Auth::set('twp_od3QG88QkAUJVQA3dMw6U6JO3oqG');
     }
 
 
     /**
-     * @return \TeamWorkPm\Response\Model
+     * @return Model
      *
-     * @throws \TeamWorkPm\Exception
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @throws \Exception
      */
-    public function getAccount(): \TeamWorkPm\Response\Model {
+    public function getAccount(): Model {
         $cacheItem = $this->cache->getItem('account');
         if (!$cacheItem->isHit()) {
-            /** @var \TeamWorkPm\Account $account */
-            $account = \TeamWorkPm\Factory::build('account');
+            /** @var Account $account */
+            $account = Factory::build('account');
             $cacheItem->set($account->get());
             $cacheItem->expiresAt(new \DateTimeImmutable('+4 hours'));
             $this->cache->saveDeferred($cacheItem);
@@ -41,17 +50,17 @@ class Teamwork {
     }
 
     /**
-     * @return \TeamWorkPm\Response\Model
+     * @return Model
      *
-     * @throws \TeamWorkPm\Exception
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @throws \Exception
      */
-    public function getPerson(): \TeamWorkPm\Response\Model {
+    public function getPerson(): Model {
         $cacheItem = $this->cache->getItem('person');
         if (!$cacheItem->isHit()) {
-            /** @var \TeamWorkPm\Me $account */
-            $account = \TeamWorkPm\Factory::build('me');
+            /** @var Me $account */
+            $account = Factory::build('me');
             $cacheItem->set($account->get());
             $cacheItem->expiresAt(new \DateTimeImmutable('+4 hours'));
             $this->cache->saveDeferred($cacheItem);
@@ -62,15 +71,15 @@ class Teamwork {
     /**
      * @return \ArrayObject
      *
-     * @throws \TeamWorkPm\Exception
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @throws \Exception
      */
     public function getActiveProject(): \ArrayObject {
         $cacheItem = $this->cache->getItem('project');
         if (!$cacheItem->isHit()) {
-            /** @var \TeamWorkPm\Project $project */
-            $project = \TeamWorkPm\Factory::build('project');
+            /** @var Project $project */
+            $project = Factory::build('project');
             $cacheItem->set($project->getActive()[0] ?? null);
             $cacheItem->expiresAt(new \DateTimeImmutable('+4 hours'));
             $this->cache->saveDeferred($cacheItem);
@@ -82,21 +91,22 @@ class Teamwork {
      * @param \DateTimeInterface $fromDate
      * @param \DateTimeInterface $toDate
      *
-     * @return \TeamWorkPm\Response\Model
+     * @return Model
      *
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \TeamWorkPm\Exception
+     * @throws InvalidArgumentException
+     * @throws Exception
      * @throws \Exception
      */
-    public function getTime(\DateTimeInterface $fromDate, \DateTimeInterface $toDate): \TeamWorkPm\Response\Model {
-        $isThisMonth = $fromDate->diff(new \DateTimeImmutable(), true)->m < 1;
+    public function getTime(\DateTimeInterface $fromDate, \DateTimeInterface $toDate): Model {
+        $now = new \DateTimeImmutable();
+        $isThisMonth = $now < $toDate && $now > $fromDate;
         $cacheKey = 'time|'.$fromDate->format('Ymd').'|'.$toDate->format('Ymd');
         $cacheItem = $this->cache->getItem($cacheKey);
         if ($cacheItem->isHit()) {
             return $cacheItem->get();
         }
-        /** @var \TeamWorkPm\Time $time */
-        $time = \TeamWorkPm\Factory::build('time');
+        /** @var Time $time */
+        $time = Factory::build('time');
         $person = $this->getPerson();
         $timeEntries = $time->getAll(['userId' => $person->id, 'fromDate' => $fromDate->format('Ymd'), 'toDate' => $toDate->format('Ymd')]);
 

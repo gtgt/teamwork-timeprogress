@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Entity\Month;
 use App\Manager\MonthManager;
 use App\Services\Teamwork;
+use Psr\Cache\InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use TeamWorkPm\Exception;
 
 class DashboardController extends AbstractController {
     protected const UNIT_PRICE = 7500;
@@ -63,15 +65,16 @@ class DashboardController extends AbstractController {
      *
      * @return array
      *
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \TeamWorkPm\Exception
+     * @throws InvalidArgumentException
+     * @throws Exception
      * @throws \Exception
      */
-    private function addMonth(Month $month) {
+    private function addMonth(Month $month): ?array {
         $fromDate = $month->getStartDate();
         $toDate = $month->getEndDate();
         $hours = 0;
-        $isThisMonth = new \DateTimeImmutable() < $toDate;
+        $now = new \DateTimeImmutable();
+        $isThisMonth = $now < $toDate && $now > $fromDate;
         foreach ($this->teamwork->getTime($fromDate, $toDate) as $logEntry) {
             $hours += ((int)$logEntry->hours) + ((int)$logEntry->minutes) / 60;
         }
@@ -122,10 +125,10 @@ class DashboardController extends AbstractController {
      *
      * @Template(template="dashboard/index.html.twig")
      *
-     * @throws \TeamWorkPm\Exception
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
-    public function index() {
+    public function index(): array {
         $bars = [];
         /** @var Month $month */
         foreach ($this->manager->findBy([], ['id' => 'ASC'], 5) as $month) {
