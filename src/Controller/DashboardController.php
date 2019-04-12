@@ -105,8 +105,8 @@ class DashboardController extends AbstractController {
             ];
         } /** @noinspection RedundantElseClauseInspection */ else {
             $workingHours = self::getWorkingHours($fromDate, $toDate);
-            $percent = round($hours / $workingHours * 100);
-            $price = $hours / self::UNIT * self::UNIT_PRICE;
+            $percent = $toDate < $now ? round($hours / $workingHours * 100) : null;
+            $price = $toDate < $now ? $hours / self::UNIT * self::UNIT_PRICE : null;
             $priceMax = $workingHours / self::UNIT * self::UNIT_PRICE;
             return $common + [
                 'percent1' => $percent,

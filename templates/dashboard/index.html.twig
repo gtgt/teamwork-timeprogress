@@ -10,14 +10,18 @@
                     <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{ bar.percent1 }}%;">
                         <span class="progress-text">{{ bar.percent1 }}%</span>
                     </div>
-                    <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{ bar.percent2 ?? (100 - bar.percent1) }}%;">
-                        <span class="progress-text">{{ bar.percent2 ?? (100 - bar.percent1) }}%</span>
+                    {% if (bar.percent1 != null) %}
+                        <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{ bar.percent2 ?? (100 - bar.percent1) }}%;">
+                            <span class="progress-text">{{ bar.percent2 ?? (100 - bar.percent1) }}%</span>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if (bar.percent1 != null) %}
+                    <div class="pull-left text-right" style="width: {{ bar.percent1 }}%; font-size: 96%;">
+                        <div>{{ bar.hours1|number_format(2, '.', ' ') }} h</div>
+                        <div>{{ bar.price1|number_format(0, '.', ' ') }} ft</div>
                     </div>
-                </div>
-                <div class="pull-left text-right" style="width: {{ bar.percent1 }}%; font-size: 96%;">
-                    <div>{{ bar.hours1|number_format(2, '.', ' ') }} h</div>
-                    <div>{{ bar.price1|number_format(0, '.', ' ') }} ft</div>
-                </div>
+                {% endif %}
                 {% if bar.percent2 is defined and bar.hours2 > bar.hours1 %}
                     <div class="pull-left text-right" style="width: {{ bar.percent2 }}%; font-size: 96%;">
                         <div>{{ bar.hours2|number_format(2, '.', ' ') }} h</div>

@@ -70,4 +70,19 @@ class MonthController extends AbstractController {
             'form' => $form->createView()
         ];
     }
+
+    /**
+     * @Route("/month/delete/{id}", name="month_delete")
+     *
+     * @param Request $request
+     * @param Month|null $month
+     *
+     * @return array|Response
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function delete(Request $request, Month $month) {
+        $this->manager->delete($month);
+        return $this->redirectToRoute('month');
+    }
 }

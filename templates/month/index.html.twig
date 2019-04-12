@@ -19,7 +19,8 @@
                 <td>{{ month.startDate|date('Y.m.d') }}</td>
                 <td>{{ month.endDate|date('Y.m.d') }}</td>
                 <td>
-                    <a href="{{ path('month_edit', {id: month.id }) }}"><i class="glyphicon glyphicon-edit"></i></a>
+                    <a href="{{ path('month_edit', {id: month.id }) }}"><i class="glyphicon glyphicon-edit"></i></a>&nbsp;
+                    <a href="{{ path('month_delete', {id: month.id }) }}"><i class="glyphicon glyphicon-trash"></i></a>
                 </td>
             </tr>
         {% endfor %}
