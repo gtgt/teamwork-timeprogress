@@ -154,7 +154,7 @@ abstract class AbstractManager {
      *
      * @param object $entity
      */
-    protected function checkEntityClass(object $entity): void {
+    protected function checkEntityClass($entity): void {
         if (\get_class($entity) !== $this->getEntityClass()) {
             $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $caller = end($caller);
@@ -368,7 +368,7 @@ abstract class AbstractManager {
      * @throws ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function delete(object $entity, $flags = self::FLAG_AUTO_FLUSH): void {
+    public function delete($entity, $flags = self::FLAG_AUTO_FLUSH): void {
         $this->checkEntityClass($entity);
         $this->getEm()->remove($entity);
         if ($flags & self::FLAG_AUTO_FLUSH) {
@@ -392,7 +392,7 @@ abstract class AbstractManager {
      *
      * @return void
      */
-    public function injectDependency(object $entity): void {
+    public function injectDependency($entity): void {
         if ($entity instanceof ManagerAwareEntityInterface) {
             $entity->setManager($this);
         }
@@ -415,7 +415,7 @@ abstract class AbstractManager {
      *
      * @return bool
      */
-    final public function isNewEntity(object $entity) {
+    final public function isNewEntity($entity) {
         return $this->getEm()->getUnitOfWork()->getEntityState($entity) === UnitOfWork::STATE_NEW;
     }
 
@@ -424,7 +424,7 @@ abstract class AbstractManager {
      *
      * @param object $entity
      */
-    final public function detachEntity(object $entity) {
+    final public function detachEntity($entity) {
         $this->getEm()->detach($entity);
     }
 
@@ -434,7 +434,7 @@ abstract class AbstractManager {
      * @param object $entity
      * @param array $data
      */
-    protected function registerManagedEntity(object $entity, array $data = []) {
+    protected function registerManagedEntity($entity, array $data = []) {
         $this->getEm()->getUnitOfWork()->registerManaged($entity, ['id' => $entity->getId()], !empty($data) ? $data : $entity->toArray());
     }
 
@@ -445,7 +445,7 @@ abstract class AbstractManager {
      *
      * @return object
      */
-    final public function cloneEntity(object $entity) {
+    final public function cloneEntity($entity) {
 
         $this->checkEntityClass($entity);
 
@@ -471,7 +471,7 @@ abstract class AbstractManager {
      *
      * @return object
      */
-    protected function doCloneEntity(object $oldEntity, object $newEntity) {
+    protected function doCloneEntity($oldEntity, $newEntity) {
         return $newEntity;
     }
 }
