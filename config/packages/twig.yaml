@@ -6,3 +6,4 @@ twig:
         navbar:
             - { path: 'dashboard', title: 'Dashboard'}
             - { path: 'month', title: 'Months'}
+            - { path: 'app_logout', title: 'Logout'}

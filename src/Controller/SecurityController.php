@@ -6,8 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class SecurityController extends AbstractController
-{
+class SecurityController extends AbstractController {
     /**
      * @Route("/login", name="app_login")
      * @Template(template="login.html.twig")
@@ -16,8 +15,7 @@ class SecurityController extends AbstractController
      *
      * @return array
      */
-    public function login(AuthenticationUtils $authenticationUtils): array
-    {
+    public function login(AuthenticationUtils $authenticationUtils): array {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
@@ -27,5 +25,13 @@ class SecurityController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error
         ];
+    }
+
+    /**
+     * @Route("/logout", name="app_logout", methods={"GET"})
+     */
+    public function logout(): void {
+        // controller can be blank: it will never be executed!
+        throw new \BadMethodCallException('Don\'t forget to activate logout in security.yaml');
     }
 }
