@@ -120,23 +120,32 @@ class DashboardController extends AbstractController {
 
 
     /**
-     * @Route("/", name="home")
-     * @Route("/dashboard", name="dashboard")
+     * @Route("/{page}", requirements={"page": "\d+"}, name="home")
+     * @Route("/dashboard/{page}", requirements={"page": "\d+"}, name="dashboard")
      *
      * @Template(template="dashboard/index.html.twig")
      *
+     * @param int $page
+     *
+     * @return array
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function index(): array {
+    public function index(int $page = null): array {
+        $limit = 5;
+        $count = $this->manager->count();
+        $maxPage = (int)ceil($count / $limit);
+        $page = $page ?? $maxPage;
+        $offset = $limit * ($page - 1) - ($limit - $count % $limit);
         $bars = [];
         /** @var Month $month */
-        foreach ($this->manager->findBy([], ['id' => 'ASC'], 5) as $month) {
+        foreach ($this->manager->findBy([], ['id' => 'ASC'], $offset > 0 ? $limit : $count % $limit, $offset > 0 ? $offset : 0) as $month) {
             $bars[] = $this->addMonth($month);
         }
 
-
         return [
+            'page' => $page,
+            'max_page' => $maxPage,
             'bars' => $bars,
         ];
     }

@@ -299,7 +299,7 @@ abstract class AbstractManager {
      *
      * @return int The cardinality of the objects that match the given criteria.
      */
-    public function count(array $criteria): int {
+    public function count(array $criteria = []): int {
         if (method_exists($this->getRepository(), 'count')) {
             return $this->getRepository()->count($criteria);
         }
