@@ -43,6 +43,7 @@ class Month implements ManagerAwareEntityInterface {
     public function __construct() {
         $this->startDate = new \DateTime('first day of this month');
         $this->endDate = new \DateTime('last day of this month');
+        $this->setTime();
     }
 
     public function __toString() {
