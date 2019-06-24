@@ -23,10 +23,11 @@ class Teamwork {
      * Teamwork constructor.
      *
      * @param CacheItemPoolInterface $cache
+     * @param string $teamworkToken
      */
-    public function __construct(CacheItemPoolInterface $cache) {
+    public function __construct(CacheItemPoolInterface $cache, string $teamworkToken) {
         $this->cache = $cache;
-        Auth::set('twp_od3QG88QkAUJVQA3dMw6U6JO3oqG');
+        Auth::set($teamworkToken);
     }
 
 
