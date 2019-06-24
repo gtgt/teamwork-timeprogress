@@ -7,7 +7,7 @@ security:
         backend_users:
             memory:
                 users:
-                    user: { password: '$2y$13$fQRZQeQdK73frDa.1sQ.O.1WdRMODnIDV6E3IF8DOh7oHmjMqIsiq', roles: [] }
+                    user: { password: '%env(APP_PASSWORD)%', roles: [] }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
