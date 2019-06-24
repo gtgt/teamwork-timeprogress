@@ -79,9 +79,11 @@ class DashboardController extends AbstractController {
             $hours += ((int)$logEntry->hours) + ((int)$logEntry->minutes) / 60;
         }
         $hours = round($hours, 2);
+        $unitPrice = $month->getUnitPrice();
         $common = [
             'title' => (string)$month,
             'subtitle' => $fromDate->format('m.d').' - '.$toDate->format('m.d'),
+            'unit_price' => $unitPrice.' HUF/h',
         ];
         if ($isThisMonth) {
             $workingHoursAll = self::getWorkingHours($fromDate, $toDate);
@@ -90,9 +92,9 @@ class DashboardController extends AbstractController {
             $percent1 = round($hours / $workingHoursAll * 100);
             $percent2 = 100 - round(($workingHoursLeft / $workingHoursAll) * 100) - $percent1;
 
-            $price1 = $hours / self::UNIT * self::UNIT_PRICE;
-            $priceMax = $workingHoursAll / self::UNIT * self::UNIT_PRICE;
-            $price2 = ($workingHoursAll - $workingHoursLeft) / self::UNIT * self::UNIT_PRICE;
+            $price1 = $hours / self::UNIT * $unitPrice;
+            $priceMax = $workingHoursAll / self::UNIT * $unitPrice;
+            $price2 = ($workingHoursAll - $workingHoursLeft) / self::UNIT * $unitPrice;
             return $common + [
                 'percent1' => $percent1,
                 'percent2' => $percent2,
@@ -106,8 +108,8 @@ class DashboardController extends AbstractController {
         } /** @noinspection RedundantElseClauseInspection */ else {
             $workingHours = self::getWorkingHours($fromDate, $toDate);
             $percent = $toDate < $now ? round($hours / $workingHours * 100) : null;
-            $price = $toDate < $now ? $hours / self::UNIT * self::UNIT_PRICE : null;
-            $priceMax = $workingHours / self::UNIT * self::UNIT_PRICE;
+            $price = $toDate < $now ? $hours / self::UNIT * $unitPrice : null;
+            $priceMax = $workingHours / self::UNIT * $unitPrice;
             return $common + [
                 'percent1' => $percent,
                 'price1' => $price,

@@ -5,7 +5,11 @@
     {% for bar in bars %}
         <div class="row">
             <div class="col-xs-12">
-                <h3>{{ bar.title }}&nbsp;<small>{{ bar.subtitle }}</small></h3>
+                <h3 style="position: relative;">
+                    {{ bar.title }}&nbsp
+                    <small>{{ bar.subtitle }}</small>
+                    <small style="position: absolute; right: 0; bottom: 0;">{{ bar.unit_price }}</small>
+                </h3>
                 <div class="progress">
                     <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{ bar.percent1 }}%;">
                         <span class="progress-text">{{ bar.percent1 }}%</span>

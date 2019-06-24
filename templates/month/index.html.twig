@@ -8,6 +8,7 @@
             <th>Month</th>
             <th>Start</th>
             <th>End</th>
+            <th>Hourly rate</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -18,6 +19,7 @@
                 <td>{{ month }}</td>
                 <td>{{ month.startDate|date('Y.m.d') }}</td>
                 <td>{{ month.endDate|date('Y.m.d') }}</td>
+                <td>{{ month.hourlyRate }}</td>
                 <td>
                     <a href="{{ path('month_edit', {id: month.id }) }}"><i class="glyphicon glyphicon-edit"></i></a>&nbsp;
                     <a href="{{ path('month_delete', {id: month.id }) }}"><i class="glyphicon glyphicon-trash"></i></a>

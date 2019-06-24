@@ -16,6 +16,9 @@ class MonthType extends AbstractType {
                 'widget' => 'single_text',
                 'datepicker' => true,
             ])
+            ->add('hourlyRate', null, [
+                'widget_addon_append' => ['text' => 'HUF/h'],
+            ])
             ->add('save', SubmitType::class, [
                 'icon' => 'save'
             ]);

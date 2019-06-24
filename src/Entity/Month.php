@@ -1,7 +1,9 @@
 <?php
 namespace App\Entity;
+
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Month
@@ -36,6 +38,15 @@ class Month implements ManagerAwareEntityInterface {
     protected $endDate;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Assert\NotBlank()
+     * @Assert\Type(type="integer")
+     *
+     * @var int
+     */
+    protected $unitPrice;
+
+    /**
      * Month constructor.
      *
      * @throws \Exception
@@ -64,6 +75,7 @@ class Month implements ManagerAwareEntityInterface {
         $this->startDate->setTime(0, 0, 0);
         $this->endDate->setTime(23, 59, 59);
     }
+
     /**
      * @return int
      */
@@ -98,4 +110,19 @@ class Month implements ManagerAwareEntityInterface {
     public function setEndDate(\DateTimeInterface $endDate): void {
         $this->endDate = $endDate;
     }
+
+    /**
+     * @return int
+     */
+    public function getUnitPrice(): int {
+        return $this->unitPrice ?? 7500;
+    }
+
+    /**
+     * @param int $unitPrice
+     */
+    public function setUnitPrice(int $unitPrice): void {
+        $this->unitPrice = $unitPrice;
+    }
+
 }
